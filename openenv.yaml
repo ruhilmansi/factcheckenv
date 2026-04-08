@@ -1,0 +1,13 @@
+name: factcheckenv
+version: "1.0.0"
+tags: [openenv, fact-checking, misinformation, nlp]
+tasks:
+  - id: health_claim_simple
+    difficulty: easy
+  - id: election_claim_nuanced  
+    difficulty: medium
+  - id: scientific_consensus_complex
+    difficulty: hard
+observation_space: ClaimObservation
+action_space: FactCheckAction
+reward_range: [-1.0, 1.0]

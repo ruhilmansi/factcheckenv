@@ -34,6 +34,16 @@ class OpenEnv:
         self.evidence_store.reset_session()
         return self._get_observation()
 
+    def state(self) -> Dict[str, Any]:
+        task = TASKS[self.current_task_idx]
+        return {
+            "task_id": task.task_id,
+            "steps": self.steps,
+            "done": self.done,
+            "history": self.history,
+            "snippets": self.snippets
+        }
+
     def _get_observation(self) -> ClaimObservation:
         task = TASKS[self.current_task_idx]
         return ClaimObservation(

@@ -1,12 +1,14 @@
 **factcheckenv**
 
-an OpenEnv compliant reinforcement learning environment that simulates the workflow of a newsroom fact checker. the agent receives a viral claim, searches for evidence in a database and issues a verdict (TRUE, FALSE or MISLEADING). misinformation is a real problem in journalism and automated fact checking is an active area of research. this environment is designed around how real newsrooms approach claim verification like search, gather, analyze, decide.
+an OpenEnv compliant reinforcement learning environment that simulates the workflow of a newsroom fact checker. the agent receives a viral claim, searches for supporting or contradictory evidence and issues a final verdict: `TRUE`, `FALSE` or `MISLEADING`
+
+unlike many fact checking benchmarks that reduce the task to classification, this environment evaluates the full trajectory: search, retrieval, analysis and decision. it is designed to reflect how real newsrooms verify claims under step and evidence constraints
 
 **why this environment**
 
-most fact checking benchmarks hand the model a claim and ask for a label. that skips the hard part, the information retrieval. in a real newsroom, a journalist has to figure out what to search for, evaluate what comes back and then make a judgment call. this environment forces the agent to do all three.
+most fact checking benchmarks hand the model a claim and ask for a label. that skips the hardest part of real verification: deciding what to search, identifying useful evidence and knowing when the evidence is strong enough to justify a verdict.
 
-the agent gets penalized for wasting steps on bad searches, rewarded for finding relevant evidence and scored on whether the final verdict is correct. the reward function gives signal throughout the trajectory, not just at the end.
+this environment forces the agent to do all three. the agent is rewarded for useful retrieval, penalized for wasted steps and evaluated on both verdict accuracy and reasoning quality. that makes it a better fit for tool using RL agents than static classification benchmarks.
 
 **observation space**
 
@@ -76,20 +78,28 @@ API_BASE_URL=
 MODEL_NAME=
 ```
 
-sync claims to your database:
+**initialize the evidence store**
+
 ```bash
 python init_supabase.py
 ```
 
-run the baseline evaluation:
+**run the baseline evaluation**
+
 ```bash
 python inference.py
+```
+
+**start the API server**
+
+```bash
+python app.py
 ```
 
 **docker**
 
 ```bash
-docker build -t factcheckenv 
+docker build -t factcheckenv .
 docker run -p 7860:7860 --env-file .env factcheckenv
 ```
 
@@ -112,24 +122,29 @@ docker run -p 7860:7860 --env-file .env factcheckenv
 | science_001 | FALSE | No | -0.20 |
 | **average** | | | **~0.17** |
 
-the baseline model struggles with nuanced claims that require MISLEADING verdicts. this is expected, distinguishing "false" from "misleading" requires genuine reasoning about evidence quality.
+these results are intended as an illustrative baseline on the current 3 task suite. the baseline performs reasonably on simple factual claims but struggles on nuanced cases where the correct answer is `MISLEADING` rather than strictly `FALSE`
 
 **file structure**
 
-```
+```text
 factcheckenv/
-  app.py                  — FastAPI server
-  inference.py            — Baseline evaluation script
-  openenv.yaml            — OpenEnv metadata
-  Dockerfile              — Container config
-  requirements.txt        — Dependencies
-  environment/
-    env.py                — Core OpenEnv implementation
-    tasks.py              — Task definitions
-    graders.py            — Grading logic
-    evidence_store.py     — Supabase evidence retrieval
-    data/
-      claims.json         — Claim dataset
+├── app.py                  # FastAPI server
+├── inference.py            # Baseline evaluation script
+├── init_supabase.py        # Database initialization script
+├── openenv.yaml            # OpenEnv metadata
+├── Dockerfile              # Container config
+├── requirements.txt        # Pip dependencies
+├── pyproject.toml          # Project metadata
+├── uv.lock                 # Locked dependency resolution
+├── environment/
+│   ├── env.py              # Core OpenEnv implementation
+│   ├── tasks.py            # Task definitions
+│   ├── graders.py          # Grading logic
+│   ├── evidence_store.py   # Supabase evidence retrieval
+│   └── data/
+│       └── claims.json     # Claim dataset
+└── server/
+    └── ...
 ```
 
 **tech stack**

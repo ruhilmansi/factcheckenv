@@ -23,7 +23,7 @@ the agent receives a `ClaimObservation` (Pydantic model) at each step:
 
 **action space**
 
-the agent returns a `FactCheckAction` (pydantic model):
+the agent returns a `FactCheckAction` (Pydantic model):
 
 | field | type | description |
 |---|---|---|
@@ -131,6 +131,19 @@ factcheckenv/
     data/
       claims.json         — Claim dataset
 ```
+
+**tech stack**
+
+| Layer | Technology |
+|---|---|
+| Language | Python 3 |
+| Framework | FastAPI |
+| LLM | Qwen2.5-7B-Instruct (via HF Inference Router) |
+| LLM Client | OpenAI Python SDK |
+| Database | Supabase (PostgreSQL + RLS) |
+| Data Models | Pydantic |
+| Deployment | Docker + Hugging Face Spaces |
+| Spec | OpenEnv (step/reset/state) |
 
 **OpenEnv compliance**
 

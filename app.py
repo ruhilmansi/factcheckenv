@@ -7,6 +7,10 @@ from environment.tasks import TASKS
 app = FastAPI()
 env = OpenEnv()
 
+@app.get("/")
+def root():
+    return {"status": "ok", "env": "factcheck-env"}
+
 @app.get("/health")
 def health():
     return {"status": "ok", "env": "factcheck-env"}

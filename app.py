@@ -55,7 +55,7 @@ def run_task(task_id: str):
                 action = FactCheckAction(action_type="verdict", verdict="FALSE", reasoning="dummy reasoning")
 
             obs, reward, done, info = env.step(action)
-            total_reward += reward
+            total_reward = reward
             steps += 1
 
         total_reward = max(0.01, min(0.99, total_reward))

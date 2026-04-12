@@ -65,7 +65,7 @@ class OpenEnv:
 
     def step(self, action: FactCheckAction) -> Tuple[ClaimObservation, float, bool, Dict[str, Any]]:
         if self.done:
-            return self._get_observation(), 0.0, True, {"info": "Env already done"}
+            return self._get_observation(), 0.01, True, {"info": "Env already done"}
 
         task = TASKS[self.current_task_idx]
         self.steps += 1
@@ -73,7 +73,7 @@ class OpenEnv:
 
         if self.steps > task.max_steps:
             self.done = True
-            return self._get_observation(), -0.5, True, {"info": "Max steps exceeded"}
+            return self._get_observation(), 0.01, True, {"info": "Max steps exceeded"}
 
         if action.action_type == "search":
             if action.query:

@@ -1,8 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Dict, Any
-from environment.env import OpenEnv, FactCheckAction, ClaimObservation
-from environment.tasks import TASKS
+from environment.env import OpenEnv, FactCheckAction
 
 app = FastAPI()
 env = OpenEnv()
@@ -34,7 +31,7 @@ def step(action: FactCheckAction):
     obs, reward, done, info = env.step(action)
     return {
         "observation": obs.model_dump(),
-        "reward": reward,
+        "reward": max(0.01, min(0.99, reward)),
         "done": done,
         "info": info
     }
@@ -44,22 +41,28 @@ def run_task(task_id: str):
     try:
         env.load_task(task_id)
         obs = env.reset()
-        total_reward = 0
         done = False
         steps = 0
+        final_reward = 0.01
 
         while not done and steps < 10:
             if steps == 0:
                 action = FactCheckAction(action_type="search", query="baseline check")
             else:
-                action = FactCheckAction(action_type="verdict", verdict="FALSE", reasoning="dummy reasoning")
+                action = FactCheckAction(
+                    action_type="verdict",
+                    verdict="FALSE",
+                    reasoning="dummy reasoning"
+                )
 
             obs, reward, done, info = env.step(action)
-            total_reward = reward
+            final_reward = reward
             steps += 1
 
-        total_reward = max(0.01, min(0.99, total_reward))
-
-        return {"task_id": task_id, "total_reward": total_reward, "final_status": "done" if done else "incomplete"}
+        return {
+            "task_id": task_id,
+            "total_reward": max(0.01, min(0.99, final_reward)),
+            "final_status": "done" if done else "incomplete"
+        }
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))

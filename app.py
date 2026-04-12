@@ -58,6 +58,8 @@ def run_task(task_id: str):
             total_reward += reward
             steps += 1
 
+        total_reward = max(0.01, min(0.99, total_reward))
+
         return {"task_id": task_id, "total_reward": total_reward, "final_status": "done" if done else "incomplete"}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))

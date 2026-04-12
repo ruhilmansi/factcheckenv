@@ -96,7 +96,9 @@ class OpenEnv:
 
         elif action.action_type == "skip":
             self.done = True
-            reward = 0.0
+            reward = 0.5 # neutral score
+            
+        reward = max(0.01, min(0.99, reward))
 
         return self._get_observation(), reward, self.done, {"info": "step executed"}
 

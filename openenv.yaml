@@ -10,4 +10,4 @@ tasks:
     difficulty: hard
 observation_space: ClaimObservation
 action_space: FactCheckAction
-reward_range: [-1.0, 1.0]
+reward_range: [0.01, 0.99]

@@ -11,7 +11,7 @@ api_base_url = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 model_name = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct")
 hf_token = os.getenv("HF_TOKEN")
 
-client = OpenAI(base_url=api_base_url, api_key=hf_token)
+client = None
 
 def build_context(obs):
     prompt = f"fact check this: {obs.claim_text}\n\n"
@@ -28,6 +28,12 @@ def build_context(obs):
     return prompt
 
 def get_action(obs):
+    global client
+    if client is None:
+        # Client tabhi initialize hoga jab model ko pehli baar call kiya jayega.
+        # Tab tak hum assume karte hain ki runtime me HF_TOKEN available ho jayega.
+        client = OpenAI(base_url=api_base_url, api_key=os.getenv("HF_TOKEN"))
+        
     res = client.chat.completions.create(
         model=model_name,
         messages=[
